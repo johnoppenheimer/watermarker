@@ -43,8 +43,16 @@ export default function Home() {
     return (
         <div className="container">
             <Head>
-                <title>Create Next App</title>
+                <title>Watermarker</title>
                 <link rel="icon" href="/favicon.ico" />
+                <meta name="description" content="Watermarker is a tool to add a watermark in bulk to PDF files" />
+                <meta property="og:title" content="Watermarker" />
+                <meta property="og:type" content="website" />
+                <meta
+                    property="og:description"
+                    content="Watermarker is a tool to add a watermark in bulk to PDF files"
+                />
+                <meta property="og:url" content="https://watermarker.oppenheimer.vercel.app" />
             </Head>
 
             <main>
