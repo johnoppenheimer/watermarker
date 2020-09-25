@@ -7,7 +7,11 @@ import { saveAs } from 'file-saver';
 import { addWatermarkToFile } from '../utils/pdf';
 
 function renderFiles(files: FileWithPath[]) {
-    return files.map((file) => <li key={file.name}>{file.path}</li>);
+    return files.map((file) => (
+        <li key={file.name} className="text-md">
+            {file.path}
+        </li>
+    ));
 }
 
 export default function Home() {
@@ -18,7 +22,11 @@ export default function Home() {
         setFiles(files.filter((file) => file.type.endsWith('pdf')));
     }, []);
 
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+        onDrop,
+        noClick: true,
+        accept: 'application/pdf',
+    });
 
     const onTextChange = (value: ChangeEvent<HTMLInputElement>) => {
         setWatermarkText(value.target.value);
@@ -41,7 +49,7 @@ export default function Home() {
     };
 
     return (
-        <div className="container">
+        <div className="container mx-auto h-screen flex flex-col">
             <Head>
                 <title>Watermarker</title>
                 <link rel="icon" href="/favicon.ico" />
@@ -55,108 +63,62 @@ export default function Home() {
                 <meta property="og:url" content="https://watermarker.oppenheimer.vercel.app" />
             </Head>
 
-            <main>
-                <h1 className="title">Welcome to Watermarker!</h1>
-
-                <p className="description">Add quickly a watermark on all of your files</p>
-
+            <main className="flex flex-1 flex-col justify-center items-center">
                 {files.length <= 0 ? (
-                    <div className="drop-container" {...getRootProps()}>
+                    <div
+                        className={`w-full h-full flex flex-1 flex-col justify-center items-center ${
+                            isDragActive ? 'bg-blue-300 border-dashed border-8' : ''
+                        }`}
+                        {...getRootProps()}
+                    >
                         <input {...getInputProps()} />
-                        <p>{isDragActive ? 'Drop the files here' : 'Drag files here for watermarking them'}</p>
+                        {isDragActive ? (
+                            <h3 className="text-4xl font-extrabold">Drop the files</h3>
+                        ) : (
+                            <div className="text-center">
+                                <h1 className="text-5xl font-extrabold">Welcome to Watermarker!</h1>
+                                <p className="text-lg">
+                                    Add quickly a watermark on all of your files.
+                                    <br />
+                                    {"Just drag'n'drop any PDFs files here."}
+                                </p>
+                            </div>
+                        )}
                     </div>
                 ) : (
                     <>
-                        <input type="text" value={watermarkText} onChange={onTextChange} />
-                        <ul>{renderFiles(files)}</ul>
+                        <div className="w-1/3">
+                            <input
+                                id="watermark-text"
+                                type="text"
+                                className="w-full shadow-md border border-grey-300 rounded p-2 text-md"
+                                value={watermarkText}
+                                onChange={onTextChange}
+                                placeholder="watermark"
+                            />
+                        </div>
+                        <ul className="font-mono my-8">{renderFiles(files)}</ul>
                         <div>
-                            <button onClick={resetFiles}>Reset</button>
-                            <button onClick={download}>Generate</button>
+                            <button
+                                className="py-2 px-4 border border-red-600 rounded text-red-600 hover:bg-red-600 hover:text-white shadow-md transition-colors duration-300 mx-2"
+                                onClick={resetFiles}
+                            >
+                                Reset
+                            </button>
+                            <button
+                                className="py-2 px-4 text-white bg-gradient-to-t from-green-500 to-green-400 rounded shadow-md hover:shadow-xl transition-shadow duration-300 mx-2"
+                                onClick={download}
+                            >
+                                Generate
+                            </button>
                         </div>
                     </>
                 )}
             </main>
 
-            <footer>Everything happen in your browser</footer>
-
-            <style jsx>{`
-                .container {
-                    min-height: 100vh;
-                    padding: 0 0.5rem;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
-                }
-
-                main {
-                    padding: 5rem 0;
-                    flex: 1;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
-                }
-
-                footer {
-                    width: 100%;
-                    height: 100px;
-                    border-top: 1px solid #eaeaea;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                }
-
-                .title a {
-                    color: #0070f3;
-                    text-decoration: none;
-                }
-
-                .title a:hover,
-                .title a:focus,
-                .title a:active {
-                    text-decoration: underline;
-                }
-
-                .title {
-                    margin: 0;
-                    line-height: 1.15;
-                    font-size: 4rem;
-                }
-
-                .title,
-                .description {
-                    text-align: center;
-                }
-
-                .description {
-                    line-height: 1.5;
-                    font-size: 1.5rem;
-                }
-
-                .drop-container {
-                    height: 150px;
-                    width: 300px;
-                    background-color: grey;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-            `}</style>
-
-            <style jsx global>{`
-                html,
-                body {
-                    padding: 0;
-                    margin: 0;
-                    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell,
-                        Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-                }
-
-                * {
-                    box-sizing: border-box;
-                }
-            `}</style>
+            <footer className="h-20 flex justify-center items-center text-md font-light">
+                Everything happen and stays in your browser
+            </footer>
         </div>
     );
 }
