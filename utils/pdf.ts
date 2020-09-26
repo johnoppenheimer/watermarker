@@ -3,11 +3,13 @@ import { degrees, PDFDocument, PDFFont, PDFPage, rgb, StandardFonts } from 'pdf-
 export type WatermarkOptions = {
     font: StandardFonts;
     fontSize: number;
+    opacity: number;
 };
 
 const defaultOptions: WatermarkOptions = {
     font: StandardFonts.Helvetica,
     fontSize: 50,
+    opacity: 0.2,
 };
 
 /**
@@ -47,7 +49,7 @@ type PageWatermarkOptions = Omit<WatermarkOptions, 'font'> & { font: PDFFont };
 export async function addWatermarkToPage(text: string, page: PDFPage, options: PageWatermarkOptions) {
     const { width, height } = page.getSize();
 
-    const { font, fontSize } = options;
+    const { font, fontSize, opacity } = options;
     const textWidth = font.widthOfTextAtSize(text, fontSize);
     const textHeight = font.heightAtSize(fontSize);
 
@@ -66,6 +68,6 @@ export async function addWatermarkToPage(text: string, page: PDFPage, options: P
         font: options.font,
         color: rgb(0, 0, 0),
         rotate: degrees(angle),
-        opacity: 0.2,
+        opacity,
     });
 }

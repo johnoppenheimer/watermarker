@@ -30,6 +30,7 @@ export default function CreateWatermark({ files, onReset }: CreateWatermarkProps
     const [watermarkText, setWatermarkText] = useState<string>('');
     const [watermarkFont, setWatermarkFont] = useState(StandardFonts.Helvetica);
     const [watermarkFontSize, setWatermarkFontSize] = useState(50);
+    const [watermarkOpacity, setWatermarkOpacity] = useState(0.2);
     const [loading, setLoading] = useState(false);
     const [pdfPreviewFile, setPDFPreviewFile] = useState<File | null>(null);
     const pdfPreviewRef = useRef<HTMLEmbedElement>();
@@ -60,6 +61,7 @@ export default function CreateWatermark({ files, onReset }: CreateWatermarkProps
                     const dataURI = await debounceAddWatermarkAndGetURI(watermarkText, pdfPreviewFile, {
                         fontSize: watermarkFontSize,
                         font: watermarkFont,
+                        opacity: watermarkOpacity,
                     });
                     displayPreview(dataURI);
                 } else {
@@ -72,7 +74,7 @@ export default function CreateWatermark({ files, onReset }: CreateWatermarkProps
         };
 
         updatePreview();
-    }, [watermarkText, pdfPreviewFile, watermarkFontSize, watermarkFont]);
+    }, [watermarkText, pdfPreviewFile, watermarkFontSize, watermarkFont, watermarkOpacity]);
 
     const reset = () => {
         setWatermarkText('');
@@ -113,19 +115,35 @@ export default function CreateWatermark({ files, onReset }: CreateWatermarkProps
                         placeholder="watermark"
                         disabled={loading}
                     />
-                    <div className="mt-6">
-                        <p className="mb-2">
-                            <span className="text-gray-600">Font size:</span> {watermarkFontSize}
-                        </p>
-                        <input
-                            id="watermark-font-size"
-                            type="range"
-                            min={10}
-                            max={100}
-                            step={1}
-                            value={watermarkFontSize}
-                            onChange={(event) => setWatermarkFontSize(parseInt(event.target.value))}
-                        />
+                    <div className="flex flex-row justify-between items-center mt-6">
+                        <div>
+                            <p className="mb-2">
+                                <span className="text-gray-600">Font size:</span> {watermarkFontSize}
+                            </p>
+                            <input
+                                id="watermark-font-size"
+                                type="range"
+                                min={10}
+                                max={100}
+                                step={1}
+                                value={watermarkFontSize}
+                                onChange={(event) => setWatermarkFontSize(parseInt(event.target.value))}
+                            />
+                        </div>
+                        <div>
+                            <p className="mb-2">
+                                <span className="text-gray-600">Opacity:</span> {watermarkOpacity}
+                            </p>
+                            <input
+                                id="watermark-font-size"
+                                type="range"
+                                min={0}
+                                max={1}
+                                step={0.1}
+                                value={watermarkOpacity}
+                                onChange={(event) => setWatermarkOpacity(parseFloat(event.target.value))}
+                            />
+                        </div>
                     </div>
                     <div className="mt-6">
                         <p className="mb-2">
