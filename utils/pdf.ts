@@ -28,7 +28,7 @@ export async function addWatermarkToFile(
     const buffer = await file.arrayBuffer();
 
     const pdf = await PDFDocument.load(buffer);
-    const font = await pdf.embedFont(StandardFonts.Helvetica);
+    const font = await pdf.embedFont(optionsWithDefault.font);
 
     const pages = pdf.getPages();
 

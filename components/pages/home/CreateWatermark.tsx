@@ -4,8 +4,8 @@ import { saveAs } from 'file-saver';
 import classnames from 'classnames';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
-import { PDFDocument } from 'pdf-lib';
-import { addWatermarkToFile } from '../../../utils/pdf';
+import { PDFDocument, StandardFonts, StandardFontValues } from 'pdf-lib';
+import { addWatermarkToFile, WatermarkOptions } from '../../../utils/pdf';
 
 function renderFiles(files: FileWithPath[]) {
     return files.map((file) => (
@@ -15,8 +15,8 @@ function renderFiles(files: FileWithPath[]) {
     ));
 }
 
-async function addWatermarkAndGetURI(text: string, file: File) {
-    const pdf = await addWatermarkToFile(text, file);
+async function addWatermarkAndGetURI(text: string, file: File, options?: Partial<WatermarkOptions>) {
+    const pdf = await addWatermarkToFile(text, file, options);
     return await pdf.saveAsBase64({ dataUri: true });
 }
 const debounceAddWatermarkAndGetURI = AwesomeDebouncePromise(addWatermarkAndGetURI, 500);
@@ -28,6 +28,8 @@ export type CreateWatermarkProps = {
 
 export default function CreateWatermark({ files, onReset }: CreateWatermarkProps) {
     const [watermarkText, setWatermarkText] = useState<string>('');
+    const [watermarkFont, setWatermarkFont] = useState(StandardFonts.Helvetica);
+    const [watermarkFontSize, setWatermarkFontSize] = useState(50);
     const [loading, setLoading] = useState(false);
     const [pdfPreviewFile, setPDFPreviewFile] = useState<File | null>(null);
     const pdfPreviewRef = useRef<HTMLEmbedElement>();
@@ -55,7 +57,10 @@ export default function CreateWatermark({ files, onReset }: CreateWatermarkProps
         const updatePreview = async () => {
             if (pdfPreviewFile != null) {
                 if (watermarkText.length > 0) {
-                    const dataURI = await debounceAddWatermarkAndGetURI(watermarkText, pdfPreviewFile);
+                    const dataURI = await debounceAddWatermarkAndGetURI(watermarkText, pdfPreviewFile, {
+                        fontSize: watermarkFontSize,
+                        font: watermarkFont,
+                    });
                     displayPreview(dataURI);
                 } else {
                     const buffer = await pdfPreviewFile.arrayBuffer();
@@ -67,7 +72,7 @@ export default function CreateWatermark({ files, onReset }: CreateWatermarkProps
         };
 
         updatePreview();
-    }, [watermarkText, pdfPreviewFile]);
+    }, [watermarkText, pdfPreviewFile, watermarkFontSize, watermarkFont]);
 
     const reset = () => {
         setWatermarkText('');
@@ -108,6 +113,52 @@ export default function CreateWatermark({ files, onReset }: CreateWatermarkProps
                         placeholder="watermark"
                         disabled={loading}
                     />
+                    <div className="mt-6">
+                        <p className="mb-2">
+                            <span className="text-gray-600">Font size:</span> {watermarkFontSize}
+                        </p>
+                        <input
+                            id="watermark-font-size"
+                            type="range"
+                            min={10}
+                            max={100}
+                            step={1}
+                            value={watermarkFontSize}
+                            onChange={(event) => setWatermarkFontSize(parseInt(event.target.value))}
+                        />
+                    </div>
+                    <div className="mt-6">
+                        <p className="mb-2">
+                            <span className="text-gray-600">Font family:</span>
+                        </p>
+                        <div className="inline-block relative w-full">
+                            <select
+                                className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+                                value={watermarkFont}
+                                onChange={(event) => {
+                                    setWatermarkFont(event.target.value as StandardFonts);
+                                }}
+                            >
+                                {StandardFontValues.filter(
+                                    (fontName) =>
+                                        fontName !== StandardFonts.Symbol && fontName !== StandardFonts.ZapfDingbats,
+                                ).map((fontName) => (
+                                    <option key={fontName} value={fontName}>
+                                        {fontName}
+                                    </option>
+                                ))}
+                            </select>
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <svg
+                                    className="fill-current h-4 w-4"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                >
+                                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <ul className="font-mono my-8">{renderFiles(files)}</ul>
                 <div>
