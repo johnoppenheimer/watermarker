@@ -103,7 +103,7 @@ export default function CreateWatermark({ files, onReset }: CreateWatermarkProps
     return (
         <div className="w-full h-full flex flex-row p-5">
             <div className="w-1/2">
-                <div className="w-1/2">
+                <div className="max-w-sm">
                     <input
                         id="watermark-text"
                         type="text"
@@ -116,12 +116,13 @@ export default function CreateWatermark({ files, onReset }: CreateWatermarkProps
                         disabled={loading}
                     />
                     <div className="flex flex-row justify-between items-center mt-6">
-                        <div>
+                        <div className="w-full">
                             <p className="mb-2">
                                 <span className="text-gray-600">Font size:</span> {watermarkFontSize}
                             </p>
                             <input
                                 id="watermark-font-size"
+                                className="w-full"
                                 type="range"
                                 min={10}
                                 max={100}
@@ -130,12 +131,14 @@ export default function CreateWatermark({ files, onReset }: CreateWatermarkProps
                                 onChange={(event) => setWatermarkFontSize(parseInt(event.target.value))}
                             />
                         </div>
-                        <div>
+                        <div className="w-12 h-12" />
+                        <div className="w-full">
                             <p className="mb-2">
                                 <span className="text-gray-600">Opacity:</span> {watermarkOpacity}
                             </p>
                             <input
                                 id="watermark-font-size"
+                                className="w-full"
                                 type="range"
                                 min={0}
                                 max={1}
