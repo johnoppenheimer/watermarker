@@ -1,9 +1,10 @@
 import Head from 'next/head';
-import { useDropzone, FileWithPath } from 'react-dropzone';
+import type { FileWithPath } from 'react-dropzone';
 import { ChangeEvent, useCallback, useState } from 'react';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import classnames from 'classnames';
+import Dropzone from '../components/pages/home/Dropzone';
 
 function renderFiles(files: FileWithPath[]) {
     return files.map((file) => (
@@ -21,12 +22,6 @@ export default function Home() {
     const onDrop = useCallback((files: FileWithPath[]) => {
         setFiles(files.filter((file) => file.type.endsWith('pdf')));
     }, []);
-
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
-        onDrop,
-        noClick: true,
-        accept: 'application/pdf',
-    });
 
     const onTextChange = (value: ChangeEvent<HTMLInputElement>) => {
         setWatermarkText(value.target.value);
@@ -68,26 +63,7 @@ export default function Home() {
 
             <main className="flex flex-1 flex-col justify-center items-center">
                 {files.length <= 0 ? (
-                    <div
-                        className={classnames('w-full h-full flex flex-1 flex-col justify-center items-center', {
-                            'bg-blue-300 border-dashed border-8': isDragActive,
-                        })}
-                        {...getRootProps()}
-                    >
-                        <input {...getInputProps()} />
-                        {isDragActive ? (
-                            <h3 className="text-4xl font-extrabold">Drop the files</h3>
-                        ) : (
-                            <div className="text-center">
-                                <h1 className="text-5xl font-extrabold">Welcome to Watermarker!</h1>
-                                <p className="text-lg">
-                                    Add quickly a watermark on all of your files.
-                                    <br />
-                                    {"Just drag'n'drop any PDFs files here."}
-                                </p>
-                            </div>
-                        )}
-                    </div>
+                    <Dropzone onDrop={onDrop} />
                 ) : (
                     <>
                         <div className="w-1/3">
