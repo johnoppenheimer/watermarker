@@ -18,7 +18,7 @@ export default function Home() {
     };
 
     return (
-        <div className="container mx-auto h-screen flex flex-col">
+        <div className="w-full mx-auto h-screen flex flex-col">
             <Head>
                 <title>Watermarker</title>
                 <link rel="icon" href="/favicon.ico" />
@@ -32,7 +32,7 @@ export default function Home() {
                 <meta property="og:url" content="https://watermarker.oppenheimer.vercel.app" />
             </Head>
 
-            <main className="flex flex-1 flex-col justify-center items-center">
+            <main className="w-full flex flex-1 flex-col justify-center items-center">
                 {files.length <= 0 ? (
                     <Dropzone onDrop={onDrop} />
                 ) : (
