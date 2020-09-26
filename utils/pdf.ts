@@ -5,7 +5,7 @@ import { degrees, PDFDocument, PDFFont, PDFPage, rgb, StandardFonts } from 'pdf-
  * @param text Text to put as watermark
  * @param file PDF File to add the watermark to
  */
-export async function addWatermarkToFile(text: string, file: File): Promise<Uint8Array> {
+export async function addWatermarkToFile(text: string, file: File): Promise<PDFDocument> {
     const buffer = await file.arrayBuffer();
 
     const pdf = await PDFDocument.load(buffer);
@@ -24,7 +24,7 @@ export async function addWatermarkToFile(text: string, file: File): Promise<Uint
         });
     }
 
-    return pdf.save();
+    return pdf;
 }
 
 type WatermarkOptions = {

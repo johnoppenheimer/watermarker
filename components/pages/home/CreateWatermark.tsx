@@ -54,7 +54,8 @@ export default function CreateWatermark({ files, onReset }: CreateWatermarkProps
 
         for (const file of files) {
             const pdfWithWatermark = await addWatermarkToFile(watermarkText, file);
-            zip.file(file.path, pdfWithWatermark);
+            const pdfBytes = await pdfWithWatermark.save();
+            zip.file(file.path, pdfBytes);
         }
         const blob = await zip.generateAsync({ type: 'blob' });
         setLoading(false);
