@@ -3,8 +3,9 @@ import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import classnames from 'classnames';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
-
+import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import { PDFDocument } from 'pdf-lib';
+import { addWatermarkToFile } from '../../../utils/pdf';
 
 function renderFiles(files: FileWithPath[]) {
     return files.map((file) => (
@@ -14,6 +15,12 @@ function renderFiles(files: FileWithPath[]) {
     ));
 }
 
+async function addWatermarkAndGetURI(text: string, file: File) {
+    const pdf = await addWatermarkToFile(text, file);
+    return await pdf.saveAsBase64({ dataUri: true });
+}
+const debounceAddWatermarkAndGetURI = AwesomeDebouncePromise(addWatermarkAndGetURI, 500);
+
 export type CreateWatermarkProps = {
     files: FileWithPath[];
     onReset: () => void;
@@ -22,21 +29,45 @@ export type CreateWatermarkProps = {
 export default function CreateWatermark({ files, onReset }: CreateWatermarkProps) {
     const [watermarkText, setWatermarkText] = useState<string>('');
     const [loading, setLoading] = useState(false);
-    const pdfPreviewRef = useRef<HTMLObjectElement>();
+    const [pdfPreviewFile, setPDFPreviewFile] = useState<File | null>(null);
+    const pdfPreviewRef = useRef<HTMLEmbedElement>();
+
+    const displayPreview = (dataURI: string) => {
+        pdfPreviewRef.current.src = dataURI;
+    };
 
     useEffect(() => {
         const loadPreview = async () => {
             if (files.length > 0) {
                 const firstFile = files[0];
+                setPDFPreviewFile(firstFile);
                 const fileBuffer = await firstFile.arrayBuffer();
                 const pdfFile = await PDFDocument.load(fileBuffer);
                 const dataURI = await pdfFile.saveAsBase64({ dataUri: true });
-                pdfPreviewRef.current.data = dataURI;
+                displayPreview(dataURI);
             }
         };
 
         loadPreview();
     }, [files]);
+
+    useEffect(() => {
+        const updatePreview = async () => {
+            if (pdfPreviewFile != null) {
+                if (watermarkText.length > 0) {
+                    const dataURI = await debounceAddWatermarkAndGetURI(watermarkText, pdfPreviewFile);
+                    displayPreview(dataURI);
+                } else {
+                    const buffer = await pdfPreviewFile.arrayBuffer();
+                    const pdfFile = await PDFDocument.load(buffer);
+                    const dataURI = await pdfFile.saveAsBase64({ dataUri: true });
+                    displayPreview(dataURI);
+                }
+            }
+        };
+
+        updatePreview();
+    }, [watermarkText, pdfPreviewFile]);
 
     const reset = () => {
         setWatermarkText('');
@@ -128,7 +159,7 @@ export default function CreateWatermark({ files, onReset }: CreateWatermarkProps
                 </div>
             </div>
             <div className="w-1/2">
-                <object ref={pdfPreviewRef} id="pdf-preview" className="w-full h-full" />
+                <embed ref={pdfPreviewRef} id="pdf-preview" className="w-full h-full" type="application/pdf" />
             </div>
         </div>
     );

@@ -8,6 +8,7 @@
         "start": "next start"
     },
     "dependencies": {
+        "awesome-debounce-promise": "^2.1.0",
         "classnames": "^2.2.6",
         "file-saver": "^2.0.2",
         "jszip": "^3.5.0",
