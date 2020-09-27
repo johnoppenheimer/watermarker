@@ -5,7 +5,7 @@ import classnames from 'classnames';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import { PDFDocument, StandardFonts, StandardFontValues } from 'pdf-lib';
-import { addWatermarkToFile, WatermarkOptions } from '../../../utils/pdf';
+import { addWatermarkToFile, WatermarkOptions } from 'utils/pdf';
 
 function renderFiles(files: FileWithPath[]) {
     return files.map((file) => (

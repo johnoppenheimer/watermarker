@@ -3,8 +3,8 @@ import type { FileWithPath } from 'react-dropzone';
 import { useCallback, useState } from 'react';
 import dynamic from 'next/dynamic';
 
-import Dropzone from '../components/pages/home/Dropzone';
-const CreateWatermark = dynamic(() => import('../components/pages/home/CreateWatermark'), { ssr: false });
+import Dropzone from 'components/pages/home/Dropzone';
+const CreateWatermark = dynamic(() => import('components/pages/home/CreateWatermark'), { ssr: false });
 
 export default function Home() {
     const [files, setFiles] = useState<FileWithPath[]>([]);
