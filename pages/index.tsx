@@ -41,7 +41,10 @@ export default function Home() {
             </main>
 
             <footer className="h-20 flex justify-center items-center text-md font-light">
-                Everything happen and stays in your browser
+                Everything happen and stays in your browser | 
+                <a href="https://github.com/johnoppenheimer/watermarker" target="_blank" rel="noreferrer">
+                    GitHub
+                </a>
             </footer>
         </div>
     );
